@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    generate-unique-name: false
+    name: tacocloud1
+    username: sa
+    password:
+#  h2:
+#    console:
+#      enabled: true
+  thymeleaf:
+    cache: false
+#      spring.thymeleaf.cache=false
