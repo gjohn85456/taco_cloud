@@ -23,9 +23,8 @@ public class TacoOrder implements Serializable {
     private Long id;
 
     private Date placedAT;
-//    private Date placedAT = new Date();
+
     @ManyToOne
-    @JoinColumn(name = "userrrr_id", nullable = false)
     private User user;
 
     @NotBlank(message = "Delivery name is required")
@@ -54,7 +53,7 @@ public class TacoOrder implements Serializable {
     private String ccCVV;
 
     @ManyToMany(targetEntity = Taco.class)
-    private List<Taco> tacos = new ArrayList<>();
+     transient private List<Taco> tacos = new ArrayList<>();
 
     public void addTaco(Taco taco) {
         this.tacos.add(taco);

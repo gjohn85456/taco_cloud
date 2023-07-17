@@ -29,17 +29,6 @@ public class SecurityConfig {
             throw new UsernameNotFoundException("User '" + username + "' not found");
         };
     }
-//    @Bean
-//    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-//        List<UserDetails> userList = new ArrayList<>();
-//        userList.add(new User("buzz", encoder.encode("password"),
-//                Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"))));
-//        userList.add(new User(
-//                "woody", encoder.encode("password"),
-//                Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"))));
-//        return new InMemoryUserDetailsManager(userList);
-//    }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeHttpRequests ->
@@ -49,16 +38,12 @@ public class SecurityConfig {
                                         .requestMatchers("/", "/**").permitAll()
                 )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .csrf(csrf-> csrf
+                .csrf(csrf -> csrf
                         .ignoringRequestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")))
-                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll());
+
+                .formLogin(formLogin -> formLogin.loginPage("/login").permitAll())
+                .logout(logout -> logout.logoutSuccessUrl("/"));
         return http.build();
-
-
-//        return http.authorizeHttpRequests(authz -> authz
-//                        .requestMatchers("/design", "/orders").hasRole("USER")
-//                        .requestMatchers("/", "/**").permitAll()
-//                        .anyRequest().authenticated()).build();
 
     }
 }

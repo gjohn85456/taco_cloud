@@ -6,11 +6,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import  tacos.Ingredient;
+import tacos.Ingredient;
 import tacos.Ingredient.Type;
 import tacos.Taco;
 import tacos.TacoOrder;
 import tacos.data.IngredientRepository;
+import tacos.data.TacoRepository;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +21,18 @@ import java.util.Objects;
 @Slf4j
 @Controller
 @RequestMapping("/design")
+//@SessionAttributes указывает, что объект TacoOrder объявленный в классе
+//чуть ниже, должен поддерживаться на уровне сеанса
 @SessionAttributes("tacoOrder")
 public class DesignTacoController {
-
     private final IngredientRepository ingredientRepo;
+    private final TacoRepository tacoRepo;
 
     public DesignTacoController(
-            IngredientRepository ingredientRepo) {
+            IngredientRepository ingredientRepo
+            , TacoRepository tacoRepo) {
         this.ingredientRepo = ingredientRepo;
+        this.tacoRepo = tacoRepo;
     }
 
     @ModelAttribute
@@ -35,36 +41,19 @@ public class DesignTacoController {
         //эта запись аналогична той что замомменчена ниже
         ingredientRepo.findAll().forEach(ingredients::add);
 //        ingredientRepo.findAll().forEach(i -> ingredients.add(i));
-
-
-//        Iterable<Ingredient> ingredients = ingredientRepo.findAll();
-
-/*        List<Ingredient> ingredients = Arrays.asList(
-                new Ingredient("FLTO", "Flour Tortilla", Ingredient.Type.WRAP),
-                new Ingredient("COTO", "Corn Tortilla", Ingredient.Type.WRAP),
-                new Ingredient("GRBF", "Ground Beef", Ingredient.Type.PROTEIN),
-                new Ingredient("CARN", "Carnitas", Ingredient.Type.PROTEIN),
-                new Ingredient("TMTO", "Diced Tomatoes", Ingredient.Type.VEGGIES),
-                new Ingredient("LECT", "Lettuce", Ingredient.Type.VEGGIES),
-                new Ingredient("CHED", "Cheddar", Ingredient.Type.CHEESE),
-                new Ingredient("JACK", "Monterrey Jack", Ingredient.Type.CHEESE),
-                new Ingredient("SLSA", "Salsa", Ingredient.Type.SAUCE),
-                new Ingredient("SRCR", "Sour Cream", Ingredient.Type.SAUCE)
-        );*/
-
         Type[] types = Ingredient.Type.values();
         for (Type type : types) {
             model.addAttribute(type.toString().toLowerCase(), filterByType(ingredients, type));
         }
     }
 
-    @ModelAttribute(name =  "tacoOrder")
+    @ModelAttribute(name = "tacoOrder")
     public TacoOrder order() {
         return new TacoOrder();
     }
 
     @ModelAttribute(name = "taco")
-    public Taco taco(){
+    public Taco taco() {
         return new Taco();
     }
 
@@ -81,16 +70,20 @@ public class DesignTacoController {
             return "design";
         }
 
-        tacoOrder.addTaco(taco);
+        Taco saved = tacoRepo.save(taco);
+        tacoOrder.addTaco(saved);
+
+//        tacoOrder.addTaco(taco);
         log.info("Processing taco: {}", taco);
 
         return "redirect:/orders/current";
     }
+
     private Iterable<Ingredient> filterByType(List<Ingredient> ingredients, Type type) {
         return ingredients
                 .stream()
                 .filter(x -> x.getType().equals(type)).toList();
-                // Compliant, the list needs to be mutable
+        // Compliant, the list needs to be mutable
 //                .collect(Collectors.toList());
     }
 
