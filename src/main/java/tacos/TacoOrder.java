@@ -53,7 +53,7 @@ public class TacoOrder implements Serializable {
     private String ccCVV;
 
     @ManyToMany(targetEntity = Taco.class)
-     transient private List<Taco> tacos = new ArrayList<>();
+    private transient List<Taco> tacos = new ArrayList<>();
 
     public void addTaco(Taco taco) {
         this.tacos.add(taco);
